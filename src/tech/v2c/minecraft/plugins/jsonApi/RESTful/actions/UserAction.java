@@ -16,7 +16,6 @@ import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.user.UserPosit
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 import tech.v2c.minecraft.plugins.jsonApi.tools.gameUtils.UserUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class UserAction extends BaseAction {
@@ -42,9 +41,9 @@ public class UserAction extends BaseAction {
         onlineUser.setExperienceLevel(user.getExpToLevel());
 
         UserPositionDTO up = new UserPositionDTO();
-//        up.setX(user.getPosition().getX());
-//        up.setY(user.getPosition().getY());
-//        up.setZ(user.getPosition().getZ());
+        up.setX(user.getLocation().getX());
+        up.setY(user.getLocation().getY());
+        up.setZ(user.getLocation().getZ());
 
         onlineUser.setPosition(up);
 
@@ -72,9 +71,9 @@ public class UserAction extends BaseAction {
             onlineUser.setExperienceLevel(user.getExpToLevel());
 
             UserPositionDTO up = new UserPositionDTO();
-//            up.setX(user.getValue().getPosition().getX());
-//            up.setY(user.getValue().getPosition().getY());
-//            up.setZ(user.getValue().getPosition().getZ());
+            up.setX(user.getLocation().getX());
+            up.setY(user.getLocation().getY());
+            up.setZ(user.getLocation().getZ());
 
             onlineUser.setPosition(up);
 
@@ -381,51 +380,42 @@ public class UserAction extends BaseAction {
         return new JsonResult(playerInventoryDTO);
     }
 
-//    @ApiRoute(Path = "/api/User/GetPlayerPosition")
-//    public JsonResult GetPlayerPosition(JsonData data) {
-//        String userName = data.Data.get("name").toString();
-//
-//        Player player = UserUtils.GetPlayerByName(userName);
-//        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
-//
-//        Position position = player.getPosition();
-//        UserPositionDTO userPositionDTO = new UserPositionDTO();
-//        userPositionDTO.setX(position.getX());
-//        userPositionDTO.setY(position.getY());
-//        userPositionDTO.setZ(position.getZ());
-//
-//        return new JsonResult(userPositionDTO);
-//    }
+    @ApiRoute(Path = "/api/User/GetPlayerPosition")
+    public JsonResult GetPlayerPosition(JsonData data) {
+        String userName = data.Data.get("name").toString();
 
-//    @ApiRoute(Path = "/api/User/SetPlayerPosition")
-//    public JsonResult SetPlayerPosition(JsonData data) {
-//        String userName = data.Data.get("name").toString();
-//        double x = Double.parseDouble(data.Data.get("x").toString());
-//        double y = Double.parseDouble(data.Data.get("y").toString());
-//        double z = Double.parseDouble(data.Data.get("z").toString());
-//        Object yaw = data.Data.get("yaw");
-//        Object pitch = data.Data.get("pitch");
-//        Object msg = data.Data.get("message");
-//
-//        Player player = UserUtils.GetPlayerByName(userName);
-//        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
-//
-//        boolean result = false;
-//
-//        if (yaw != null && pitch != null) {
-//            result = player.setPositionAndRotation(new Vector3(x, y, z), Double.parseDouble(yaw.toString()), Double.parseDouble(pitch.toString()));
-//        } else {
-//            result = player.setPosition(new Vector3(x, y, z));
-//        }
-//
-//        if (msg != null) {
-//            if (result) {
-//                player.sendMessage(msg.toString());
-//            }
-//        }
-//
-//        return new JsonResult(result);
-//    }
+        Player player = UserUtils.GetPlayerByName(userName);
+        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
+
+        Location location = player.getLocation();
+        UserPositionDTO userPositionDTO = new UserPositionDTO();
+        userPositionDTO.setX(location.getX());
+        userPositionDTO.setY(location.getY());
+        userPositionDTO.setZ(location.getZ());
+
+        return new JsonResult(userPositionDTO);
+    }
+
+    // 无法使用
+    @ApiRoute(Path = "/api/User/SetPlayerPosition")
+    public JsonResult SetPlayerPosition(JsonData data) {
+        String userName = data.Data.get("name").toString();
+        double x = Double.parseDouble(data.Data.get("x").toString());
+        double y = Double.parseDouble(data.Data.get("y").toString());
+        double z = Double.parseDouble(data.Data.get("z").toString());
+
+        Object msg = data.Data.get("message");
+
+        Player player = UserUtils.GetPlayerByName(userName);
+        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
+
+        player.setVelocity(new Location(player.getWorld(),x,y,z).getDirection());
+        if (msg != null) {
+            player.sendMessage(msg.toString());
+        }
+
+        return new JsonResult();
+    }
 
     @ApiRoute(Path = "/api/User/GetPlayerHealth")
     public JsonResult GetPlayerHealth(JsonData data) {
