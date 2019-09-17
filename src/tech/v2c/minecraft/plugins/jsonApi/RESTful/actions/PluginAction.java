@@ -1,7 +1,7 @@
 package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
-import cn.nukkit.plugin.Plugin;
-import cn.nukkit.plugin.PluginManager;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import static cn.nukkit.utils.Utils.copyFile;
 
 public class PluginAction extends BaseAction {
     private final PluginManager pluginManager;
@@ -28,17 +27,16 @@ public class PluginAction extends BaseAction {
     public JsonResult GetPluginList(){
         ArrayList<PluginDTO> pluginList = new ArrayList<PluginDTO>();
 
-        Map<String, Plugin> plugins = pluginManager.getPlugins();
-        for(Iterator<Map.Entry<String, Plugin>> it = plugins.entrySet().iterator(); it.hasNext();){
-            Map.Entry<String, Plugin> itt = it.next();
+        Plugin[] plugins = pluginManager.getPlugins();
+        for (Plugin plugin : plugins) {
             PluginDTO plg = new PluginDTO();
-            plg.setName(itt.getKey());
-            plg.setVersion(itt.getValue().getDescription().getVersion());
-            plg.setWebsite(itt.getValue().getDescription().getWebsite());
-            plg.setEnabled(itt.getValue().isEnabled());
-            plg.setDisabled(itt.getValue().isDisabled());
-            plg.setAuthors(itt.getValue().getDescription().getAuthors());
-            plg.setDescription(itt.getValue().getDescription().getDescription());
+            plg.setName(plugin.getName());
+            plg.setVersion(plugin.getDescription().getVersion());
+            plg.setWebsite(plugin.getDescription().getWebsite());
+            plg.setEnabled(plugin.isEnabled());
+            plg.setDisabled(!plugin.isEnabled());
+            plg.setAuthors(plugin.getDescription().getAuthors());
+            plg.setDescription(plugin.getDescription().getDescription());
 
             pluginList.add(plg);
         }
@@ -57,7 +55,7 @@ public class PluginAction extends BaseAction {
         plg.setVersion(plugin.getDescription().getVersion());
         plg.setWebsite(plugin.getDescription().getWebsite());
         plg.setEnabled(plugin.isEnabled());
-        plg.setDisabled(plugin.isDisabled());
+        plg.setDisabled(!plugin.isEnabled());
         plg.setAuthors(plugin.getDescription().getAuthors());
         plg.setDescription(plugin.getDescription().getDescription());
         
@@ -100,25 +98,25 @@ public class PluginAction extends BaseAction {
     }
 
     // 安装插件
-    @ApiRoute(Path="/api/Plugin/Install")
-    public JsonResult InstallPlugin(JsonData data){
-        Map<String, File> allFile = ( Map<String, File>)data.Data.get("files");
-        String pluginPath = server.getPluginPath();
-
-        for (Map.Entry<String, File> plg : allFile.entrySet()) {
-            final String fileName = plg.getKey();
-            final File file = plg.getValue();
-            final String copyPath = pluginPath + fileName;
-            try {
-                copyFile(file, new File(copyPath));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            Plugin uploadPlg = pluginManager.loadPlugin(copyPath);
-            pluginManager.enablePlugin(uploadPlg);
-        }
-
-        return GetPluginList();
-    }
+//    @ApiRoute(Path="/api/Plugin/Install")
+//    public JsonResult InstallPlugin(JsonData data){
+//        Map<String, File> allFile = ( Map<String, File>)data.Data.get("files");
+//        String pluginPath = server.
+//
+//        for (Map.Entry<String, File> plg : allFile.entrySet()) {
+//            final String fileName = plg.getKey();
+//            final File file = plg.getValue();
+//            final String copyPath = pluginPath + fileName;
+//            try {
+//                copyFile(file, new File(copyPath));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            Plugin uploadPlg = pluginManager.loadPlugin(copyPath);
+//            pluginManager.enablePlugin(uploadPlg);
+//        }
+//
+//        return GetPluginList();
+//    }
 }

@@ -1,9 +1,7 @@
 package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
-import cn.nukkit.Server;
-
-import cn.nukkit.command.ConsoleCommandSender;
-import cn.nukkit.utils.Config;
+import org.bukkit.Server;
+import org.bukkit.command.ConsoleCommandSender;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
@@ -26,27 +24,27 @@ public class ServerAction extends BaseAction {
         serverInfo.setIp(server.getIp());
         serverInfo.setMaxPlayerCount(server.getMaxPlayers());
         serverInfo.setMotd(server.getMotd());
-        serverInfo.setSubMotd(server.getSubMotd());
-        serverInfo.setSubMotd(server.getSubMotd());
-        serverInfo.setNukkitVersion(server.getNukkitVersion());
-        serverInfo.setApiVersion(server.getApiVersion());
-        serverInfo.setGameMode(server.getGamemode());
-        serverInfo.setDifficulty(server.getDifficulty());
-        serverInfo.setPluginCount(server.getPluginManager().getPlugins().size());
-        serverInfo.setAutoSave(server.getAutoSave());
+//        serverInfo.setSubMotd(server.getSubMotd());
+//        serverInfo.setSubMotd(server.getSubMotd());
+        serverInfo.setNukkitVersion(server.getBukkitVersion());
+        serverInfo.setApiVersion(server.getVersion());
+        serverInfo.setGameMode(server.getDefaultGameMode().getValue());
+        // serverInfo.setDifficulty(server.get);
+        serverInfo.setPluginCount(server.getPluginManager().getPlugins().length);
+        // serverInfo.setAutoSave(server.getAutoSave());
         serverInfo.setHasWhiteList(server.hasWhitelist());
 
         return new JsonResult(serverInfo);
     }
 
-    @ApiRoute(Path="/api/Server/ExecuteCommand")
-    public JsonResult ExecuteCommand(JsonData data){
-        String cmd = data.Data.get("command").toString();
-        // TO-DO: 当前不在主线程执行命令时会抛出错误, 但是还是会正常执行. 等待 NukkitX 修复此问题. 具体可见 cn.nukkit.Server.dispatchCommand 的注释. —— By Tuisku 2019-08-17
-        boolean executeResult = server.dispatchCommand(new ConsoleCommandSender(), cmd);
-
-        return new JsonResult(executeResult);
-    }
+//    @ApiRoute(Path="/api/Server/ExecuteCommand")
+//    public JsonResult ExecuteCommand(JsonData data){
+//        String cmd = data.Data.get("command").toString();
+//        // TO-DO: 当前不在主线程执行命令时会抛出错误, 但是还是会正常执行. 等待 NukkitX 修复此问题. 具体可见 cn.nukkit.Server.dispatchCommand 的注释. —— By Tuisku 2019-08-17
+//        boolean executeResult = server.dispatchCommand(cmd);
+//
+//        return new JsonResult(executeResult);
+//    }
 
     @ApiRoute(Path="/api/Server/ReloadServer")
     public JsonResult ReloadServer(){
@@ -64,18 +62,18 @@ public class ServerAction extends BaseAction {
     @ApiRoute(Path="/api/Server/SetMaxPlayer")
     public JsonResult SetMaxPlayer(JsonData data){
         int maxPlayer = (int) Double.parseDouble(data.Data.get("maxPlayer").toString());
-        server.setMaxPlayers(maxPlayer);
+        // server.setMaxPlayers(maxPlayer);
 
         return new JsonResult();
     }
 
-    @ApiRoute(Path="/api/Server/SetAutoSave")
-    public JsonResult SetAutoSave(JsonData data){
-        boolean isAutoSave = (boolean)data.Data.get("isAutoSave");
-        server.setAutoSave(isAutoSave);
-
-        return new JsonResult();
-    }
+//    @ApiRoute(Path="/api/Server/SetAutoSave")
+//    public JsonResult SetAutoSave(JsonData data){
+//        boolean isAutoSave = (boolean)data.Data.get("isAutoSave");
+//        server.setAutoSave(isAutoSave);
+//
+//        return new JsonResult();
+//    }
 
     @ApiRoute(Path="/api/Server/SendBroadcastMessage")
     public JsonResult SendBroadcastMessage(JsonData data){
@@ -84,14 +82,14 @@ public class ServerAction extends BaseAction {
         return new JsonResult(server.broadcastMessage(message));
     }
 
-    @ApiRoute(Path="/api/Server/SetServerProps")
-    public JsonResult SetServerProps(JsonData data){
-        String key = data.Data.get("key").toString();
-        String value = data.Data.get("value").toString();
-
-        Config conf = server.getProperties();
-        conf.set(key, value);
-
-        return new JsonResult(conf.save());
-    }
+//    @ApiRoute(Path="/api/Server/SetServerProps")
+//    public JsonResult SetServerProps(JsonData data){
+//        String key = data.Data.get("key").toString();
+//        String value = data.Data.get("value").toString();
+//
+//        Config conf = server.
+//        conf.set(key, value);
+//
+//        return new JsonResult(conf.save());
+//    }
 }

@@ -1,6 +1,6 @@
 package tech.v2c.minecraft.plugins.jsonApi.EventNotify.global;
 
-import cn.nukkit.Server;
+import org.bukkit.Server;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 
 public class BaseEventListener {

@@ -7,12 +7,39 @@ public class OnlineUserDTO {
     private UUID uid;
     private String name;
     private String displayName;
-    private int gamemode;
-    private float height;
+    private int gameMode;
+    private double height;
     private UserPositionDTO position;
-    private int maxHealth;
-    private float health;
+    private double maxHealth;
+    private double health;
     private int ping;
+    private boolean isOp;
+    private int experience;
+    private int experienceLevel;
+
+    public boolean isOp() {
+        return isOp;
+    }
+
+    public void setOp(boolean op) {
+        isOp = op;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public void setExperience(int experience) {
+        this.experience = experience;
+    }
+
+    public int getExperienceLevel() {
+        return experienceLevel;
+    }
+
+    public void setExperienceLevel(int experienceLevel) {
+        this.experienceLevel = experienceLevel;
+    }
 
     public long getId() {
         return id;
@@ -38,28 +65,28 @@ public class OnlineUserDTO {
         this.name = name;
     }
 
-    public int getMaxHealth() {
+    public double getMaxHealth() {
         return maxHealth;
     }
 
-    public void setMaxHealth(int maxHealth) {
+    public void setMaxHealth(double maxHealth) {
         this.maxHealth = maxHealth;
     }
 
-    public float getHealth() {
+    public double getHealth() {
         return health;
     }
 
-    public void setHealth(float health) {
+    public void setHealth(double health) {
         this.health = health;
     }
 
-    public int getGamemode() {
-        return gamemode;
+    public int getGameMode() {
+        return gameMode;
     }
 
-    public void setGamemode(int gamemode) {
-        this.gamemode = gamemode;
+    public void setGameMode(int gameMode) {
+        this.gameMode = gameMode;
     }
 
     public int getPing() {
@@ -78,11 +105,11 @@ public class OnlineUserDTO {
         this.displayName = displayName;
     }
 
-    public float getHeight() {
+    public double getHeight() {
         return height;
     }
 
-    public void setHeight(float height) {
+    public void setHeight(double height) {
         this.height = height;
     }
 

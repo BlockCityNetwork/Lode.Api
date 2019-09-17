@@ -21,7 +21,9 @@ public class RouteManage {
             Method[] methods = item.getDeclaredMethods();
             for (Method method: methods) {
                 ApiRoute an = method.getAnnotation(ApiRoute.class);
-                actionRouteMap.put(an.Path().toLowerCase(), method);
+                if(an != null){
+                    actionRouteMap.put(an.Path().toLowerCase(), method);
+                }
             }
         }
     }

@@ -1,8 +1,8 @@
 package tech.v2c.minecraft.plugins.jsonApi.EventNotify.global;
 
-import cn.nukkit.command.ConsoleCommandSender;
-import cn.nukkit.utils.ConfigSection;
 import com.google.gson.Gson;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -14,10 +14,10 @@ import java.util.HashMap;
 
 public class JsonApiWebSocketServer extends WebSocketServer {
     public static HashMap<Object, WebSocket> connPool = new HashMap<Object, WebSocket>();
-    public static final boolean executeByWs = JsonApi.instance.getConfig().getSection("EventListener").getBoolean("ExecuteByWs");
+    public static final boolean executeByWs = JsonApi.instance.getConfig().getConfigurationSection("EventListener").getBoolean("ExecuteByWs");
 
     public JsonApiWebSocketServer() {
-        super(new InetSocketAddress(JsonApi.instance.getConfig().getSection("Server").getString("IP"), JsonApi.instance.getConfig().getSection("Server").getInt("WsPort")));
+        super(new InetSocketAddress(JsonApi.instance.getConfig().getConfigurationSection("Server").getString("IP"), JsonApi.instance.getConfig().getConfigurationSection("Server").getInt("WsPort")));
     }
 
     public static void SendMsg(JsonResult result) {
@@ -40,7 +40,7 @@ public class JsonApiWebSocketServer extends WebSocketServer {
         Gson gson = new Gson();
         WsMessage msg = gson.fromJson(message, WsMessage.class);
         if (msg.getAction().equalsIgnoreCase("auth")) {
-            ConfigSection authConf = JsonApi.instance.getConfig().getSection("Server").getSection("Authentication");
+            ConfigurationSection authConf = JsonApi.instance.getConfig().getConfigurationSection("Server").getConfigurationSection("Authentication");
             String userName = authConf.getString("UserName");
             String password = authConf.getString("Password");
 
@@ -59,18 +59,18 @@ public class JsonApiWebSocketServer extends WebSocketServer {
             return;
         }
 
-        if (msg.getAction().equalsIgnoreCase("executeCmd")) {
-            if (connPool.containsKey(conn.getDraft())) {
-                if (executeByWs) {
-                    JsonApi.instance.getServer().dispatchCommand(new ConsoleCommandSender(), msg.getParams().get("command").toString());
-                    conn.send(gson.toJson(new JsonResult(null, 204, "execute success.")));
-                }
-            } else {
-                conn.send(gson.toJson(new JsonResult(null, 401, "need login!")));
-            }
-
-            return;
-        }
+//        if (msg.getAction().equalsIgnoreCase("executeCmd")) {
+//            if (connPool.containsKey(conn.getDraft())) {
+//                if (executeByWs) {
+//                    JsonApi.instance.getServer().dispatchCommand(new ConsoleCommandSender(), msg.getParams().get("command").toString());
+//                    conn.send(gson.toJson(new JsonResult(null, 204, "execute success.")));
+//                }
+//            } else {
+//                conn.send(gson.toJson(new JsonResult(null, 401, "need login!")));
+//            }
+//
+//            return;
+//        }
 
         conn.send(gson.toJson(new JsonResult(null,403,"unknown command.")));
     }

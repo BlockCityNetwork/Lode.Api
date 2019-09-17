@@ -1,25 +1,23 @@
 package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
-import cn.nukkit.Player;
-import cn.nukkit.event.player.PlayerKickEvent;
-import cn.nukkit.inventory.PlayerInventory;
-import cn.nukkit.item.Item;
-import cn.nukkit.level.Position;
-import cn.nukkit.math.Vector3;
-import cn.nukkit.permission.BanEntry;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
+import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.server.BanEntryDTO;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.user.OnlineUserDTO;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.user.PlayerInventoryDTO;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.user.UserPositionDTO;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 import tech.v2c.minecraft.plugins.jsonApi.tools.gameUtils.UserUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 public class UserAction extends BaseAction {
     @ApiRoute(Path = "/api/User/GetUserByName")
@@ -32,18 +30,21 @@ public class UserAction extends BaseAction {
         OnlineUserDTO onlineUser = new OnlineUserDTO();
         onlineUser.setName(user.getName());
         onlineUser.setDisplayName(user.getDisplayName());
-        onlineUser.setId(user.getId());
+        onlineUser.setId(user.getEntityId());
         onlineUser.setUid(user.getUniqueId());
-        onlineUser.setGamemode(user.getGamemode());
+        onlineUser.setGameMode(user.getGameMode().getValue());
         onlineUser.setHeight(user.getHeight());
         onlineUser.setHealth(user.getHealth());
         onlineUser.setMaxHealth(user.getMaxHealth());
-        onlineUser.setPing(user.getPing());
+        // onlineUser.setPing(user.getAddress().getAddress().);
+        onlineUser.setOp(user.isOp());
+        onlineUser.setExperience(user.getTotalExperience());
+        onlineUser.setExperienceLevel(user.getExpToLevel());
 
         UserPositionDTO up = new UserPositionDTO();
-        up.setX(user.getPosition().getX());
-        up.setY(user.getPosition().getY());
-        up.setZ(user.getPosition().getZ());
+//        up.setX(user.getPosition().getX());
+//        up.setY(user.getPosition().getY());
+//        up.setZ(user.getPosition().getZ());
 
         onlineUser.setPosition(up);
 
@@ -52,30 +53,34 @@ public class UserAction extends BaseAction {
 
     @ApiRoute(Path = "/api/User/GetOnlineList")
     public JsonResult GetOnlineUserList() {
-        Map<UUID, Player> users = server.getOnlinePlayers();
+        Collection<? extends Player> users = server.getOnlinePlayers();
         ArrayList<OnlineUserDTO> userList = new ArrayList<OnlineUserDTO>();
 
-        for (Map.Entry<UUID, Player> user : users.entrySet()) {
+        for (Player user : users) {
             OnlineUserDTO onlineUser = new OnlineUserDTO();
-            onlineUser.setName(user.getValue().getName());
-            onlineUser.setDisplayName(user.getValue().getDisplayName());
-            onlineUser.setId(user.getValue().getId());
-            onlineUser.setUid(user.getKey());
-            onlineUser.setGamemode(user.getValue().getGamemode());
-            onlineUser.setHeight(user.getValue().getHeight());
-            onlineUser.setHealth(user.getValue().getHealth());
-            onlineUser.setMaxHealth(user.getValue().getMaxHealth());
-            onlineUser.setPing(user.getValue().getPing());
+            onlineUser.setName(user.getName());
+            onlineUser.setDisplayName(user.getDisplayName());
+            onlineUser.setId(user.getEntityId());
+            onlineUser.setUid(user.getUniqueId());
+            onlineUser.setGameMode(user.getGameMode().getValue());
+            onlineUser.setHeight(user.getHeight());
+            onlineUser.setHealth(user.getHealth());
+            onlineUser.setMaxHealth(user.getMaxHealth());
+            // onlineUser.setPing(user.getPing());
+            onlineUser.setOp(user.isOp());
+            onlineUser.setExperience(user.getTotalExperience());
+            onlineUser.setExperienceLevel(user.getExpToLevel());
 
             UserPositionDTO up = new UserPositionDTO();
-            up.setX(user.getValue().getPosition().getX());
-            up.setY(user.getValue().getPosition().getY());
-            up.setZ(user.getValue().getPosition().getZ());
+//            up.setX(user.getValue().getPosition().getX());
+//            up.setY(user.getValue().getPosition().getY());
+//            up.setZ(user.getValue().getPosition().getZ());
 
             onlineUser.setPosition(up);
 
             userList.add(onlineUser);
         }
+
         return new JsonResult(userList);
     }
 
@@ -83,33 +88,9 @@ public class UserAction extends BaseAction {
     public JsonResult BanUserByName(JsonData data) {
         String userName = data.Data.get("name").toString();
         Object reason = data.Data.get("reason");
-        Object startTime = data.Data.get("creationDate");
         Object endTime = data.Data.get("expirationDate");
 
-        BanEntry be = new BanEntry(userName);
-        be.setReason(reason == null ? "" : reason.toString());
-        be.setCreationDate(startTime != null ? new Date(Long.parseLong(startTime.toString())) : new Date());
-        if (endTime != null) {
-            be.setExpirationDate(new Date(Long.parseLong(endTime.toString())));
-        }
-
-        server.getNameBans().add(be);
-
-        return new JsonResult(be);
-    }
-
-    @ApiRoute(Path = "/api/User/RemoveNameBan")
-    public JsonResult RemoveNameBan(JsonData data){
-        String userName = data.Data.get("target").toString();
-        server.getNameBans().remove(userName);
-
-        return new JsonResult();
-    }
-
-    @ApiRoute(Path = "/api/User/RemoveIpBan")
-    public JsonResult RemoveIpBan(JsonData data){
-        String ip = data.Data.get("target").toString();
-        server.getIPBans().remove(ip);
+        server.getBanList(BanList.Type.NAME).addBan(userName, reason == null ? "" : reason.toString(), endTime != null ? new Date(Long.parseLong(endTime.toString())) : null, null);
 
         return new JsonResult();
     }
@@ -117,62 +98,101 @@ public class UserAction extends BaseAction {
     @ApiRoute(Path = "/api/User/BanByIp")
     public JsonResult BanUserByIp(JsonData data) {
         String userIp = data.Data.get("ip").toString();
-        Object reason = data.Data.get("reason");
-        Object endTime = data.Data.get("expirationDate");
-        Object startTime = data.Data.get("creationDate");
 
-        BanEntry be = new BanEntry(userIp);
-        be.setReason(reason == null ? "" : reason.toString());
-        be.setCreationDate(startTime != null ? new Date(Long.parseLong(startTime.toString())) : new Date());
-        if (endTime != null) {
-            be.setExpirationDate(new Date(Long.parseLong(endTime.toString())));
-        }
+        server.banIP(userIp);
 
-        server.getIPBans().add(be);
+        return new JsonResult();
+    }
 
-        return new JsonResult(be);
+    @ApiRoute(Path = "/api/User/RemoveNameBan")
+    public JsonResult RemoveNameBan(JsonData data){
+        String userName = data.Data.get("target").toString();
+        server.getBanList(BanList.Type.NAME).pardon(userName);
+
+        return new JsonResult();
+    }
+
+    @ApiRoute(Path = "/api/User/RemoveIpBan")
+    public JsonResult RemoveIpBan(JsonData data){
+        String ip = data.Data.get("target").toString();
+        server.unbanIP(ip);
+
+        return new JsonResult();
     }
 
     @ApiRoute(Path = "/api/User/GetNameBanList")
     public JsonResult GetNameBanList() {
-        return new JsonResult(server.getNameBans().getEntires().values());
+        List<BanEntryDTO> banList = new ArrayList<BanEntryDTO>();
+        server.getBanList(BanList.Type.NAME).getBanEntries().forEach(banUser -> {
+            BanEntryDTO banEntry = new BanEntryDTO();
+
+            banEntry.setName(banUser.getTarget());
+            banEntry.setReason(banUser.getReason());
+            banEntry.setExpires(banUser.getExpiration());
+
+            banList.add(banEntry);
+        });
+
+        return new JsonResult(banList);
     }
 
     @ApiRoute(Path = "/api/User/GetIpBanList")
     public JsonResult GetIpBanList() {
-        return new JsonResult(server.getIPBans().getEntires().values());
+        List<BanEntryDTO> banList = new ArrayList<BanEntryDTO>();
+
+        server.getBanList(BanList.Type.IP).getBanEntries().forEach(banUser -> {
+            BanEntryDTO banEntry = new BanEntryDTO();
+
+            banEntry.setName(banUser.getTarget());
+            banEntry.setReason(banUser.getReason());
+            banEntry.setExpires(banUser.getExpiration());
+
+            banList.add(banEntry);
+        });
+
+        return new JsonResult(banList);
     }
 
     @ApiRoute(Path = "/api/User/GetWhiteList")
     public JsonResult GetWhiteList() {
-        return new JsonResult(server.getWhitelist().getAll().keySet());
+        ArrayList<String> whiteList = new ArrayList<String>();
+        server.getWhitelistedPlayers().forEach(whiteListUser -> {
+            whiteList.add(whiteListUser.getName());
+        });
+
+        return new JsonResult(whiteList);
     }
 
     @ApiRoute(Path = "/api/User/AddWhiteList")
     public JsonResult AddWhiteList(JsonData data) {
         String userName = data.Data.get("name").toString();
-        server.addWhitelist(userName);
-
+        OfflinePlayer player = server.getOfflinePlayer(userName);
+        player.setWhitelisted(true);
         return GetWhiteList();
     }
 
     @ApiRoute(Path = "/api/User/RemoveWhiteList")
     public JsonResult RemoveWhiteList(JsonData data) {
         String userName = data.Data.get("name").toString();
-        server.removeWhitelist(userName);
-
+        OfflinePlayer player = server.getOfflinePlayer(userName);
+        player.setWhitelisted(false);
         return GetWhiteList();
     }
 
     @ApiRoute(Path = "/api/User/GetOPList")
     public JsonResult GetOpList() {
-        return new JsonResult(server.getOps().getAll().keySet());
+        ArrayList<String> opList = new ArrayList<String>();
+        server.getOperators().forEach(op -> {
+            opList.add(op.getName());
+        });
+        return new JsonResult(opList);
     }
 
     @ApiRoute(Path = "/api/User/AddOp")
     public JsonResult AddOp(JsonData data) {
         String userName = data.Data.get("name").toString();
-        server.addOp(userName);
+        OfflinePlayer player = server.getOfflinePlayer(userName);
+        player.setOp(true);
 
         return GetOpList();
     }
@@ -180,7 +200,8 @@ public class UserAction extends BaseAction {
     @ApiRoute(Path = "/api/User/RemoveOp")
     public JsonResult RemoveOp(JsonData data) {
         String userName = data.Data.get("name").toString();
-        server.removeOp(userName);
+        OfflinePlayer player = server.getOfflinePlayer(userName);
+        player.setOp(false);
 
         return GetOpList();
     }
@@ -192,7 +213,9 @@ public class UserAction extends BaseAction {
         Player user = UserUtils.GetPlayerByName(userName);
         if (user == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        return new JsonResult(user.setGamemode(gameMode));
+        user.setGameMode(GameMode.getByValue(gameMode));
+
+        return new JsonResult();
     }
 
     @ApiRoute(Path = "/api/User/SendChat")
@@ -204,7 +227,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.sendChat(source == null ? "" : source.toString(), message);
+        player.chat(message);
 
         return new JsonResult();
     }
@@ -233,9 +256,9 @@ public class UserAction extends BaseAction {
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
         if (expType == 0) {
-            player.sendExperience(value);
+            player.giveExp(value);
         } else {
-            player.sendExperienceLevel(value);
+            player.giveExpLevels(value);
         }
 
         if (msg != null) {
@@ -254,7 +277,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.setOnFire(time);
+        player.setFireTicks(time);
 
         if (msg != null) {
             player.sendMessage(msg.toString());
@@ -271,7 +294,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.kill();
+        player.setHealth(0);
 
         if (msg != null) {
             player.sendMessage(msg.toString());
@@ -280,6 +303,7 @@ public class UserAction extends BaseAction {
         return new JsonResult();
     }
 
+    // 无法执行
     @ApiRoute(Path = "/api/User/KickPlayer")
     public JsonResult KickPlayer(JsonData data) {
         String userName = data.Data.get("name").toString();
@@ -289,7 +313,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.kick(reason == null ? PlayerKickEvent.Reason.UNKNOWN.toString() : reason.toString(), isKickByAdmin);
+        player.kickPlayer("");
 
         return new JsonResult();
     }
@@ -302,7 +326,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.getInventory().clearAll();
+        player.getInventory().clear();
 
         if (msg != null) {
             player.sendMessage(msg.toString());
@@ -321,15 +345,17 @@ public class UserAction extends BaseAction {
 
         PlayerInventory playerInventory = player.getInventory();
         for (int i = 0; i < playerInventory.getSize(); i++) {
-            Item item = playerInventory.getItem(i);
-            if (item.getId() != Item.AIR) {
-                PlayerInventoryDTO playerInventoryDTO = new PlayerInventoryDTO();
-                playerInventoryDTO.setIndex(i);
-                playerInventoryDTO.setId(item.getId());
-                playerInventoryDTO.setName(item.getName());
-                playerInventoryDTO.setCount(item.count);
+            ItemStack item = playerInventory.getItem(i);
+            if(item != null){
+                if (item.getType() != Material.getMaterial("AIR")) {
+                    PlayerInventoryDTO playerInventoryDTO = new PlayerInventoryDTO();
+                    playerInventoryDTO.setIndex(i);
+                    playerInventoryDTO.setId(item.getType().getId());
+                    playerInventoryDTO.setName(item.getType().name());
+                    playerInventoryDTO.setCount(item.getAmount());
 
-                list.add(playerInventoryDTO);
+                    list.add(playerInventoryDTO);
+                }
             }
         }
 
@@ -345,62 +371,61 @@ public class UserAction extends BaseAction {
 
         PlayerInventory playerInventory = player.getInventory();
 
-        Item item = playerInventory.getItemInHand();
+        ItemStack item = playerInventory.getItemInMainHand();
         PlayerInventoryDTO playerInventoryDTO = new PlayerInventoryDTO();
-        playerInventoryDTO.setIndex(playerInventory.getHeldItemIndex());
-        playerInventoryDTO.setId(item.getId());
-        playerInventoryDTO.setName(item.getName());
-        playerInventoryDTO.setCount(item.count);
+        // playerInventoryDTO.setIndex(playerInventory.getItemInHand().);
+        playerInventoryDTO.setId(item.getType().getId());
+        playerInventoryDTO.setName(item.getType().name());
+        playerInventoryDTO.setCount(item.getAmount());
 
         return new JsonResult(playerInventoryDTO);
     }
 
-    @ApiRoute(Path = "/api/User/GetPlayerPosition")
-    public JsonResult GetPlayerPosition(JsonData data) {
-        String userName = data.Data.get("name").toString();
+//    @ApiRoute(Path = "/api/User/GetPlayerPosition")
+//    public JsonResult GetPlayerPosition(JsonData data) {
+//        String userName = data.Data.get("name").toString();
+//
+//        Player player = UserUtils.GetPlayerByName(userName);
+//        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
+//
+//        Position position = player.getPosition();
+//        UserPositionDTO userPositionDTO = new UserPositionDTO();
+//        userPositionDTO.setX(position.getX());
+//        userPositionDTO.setY(position.getY());
+//        userPositionDTO.setZ(position.getZ());
+//
+//        return new JsonResult(userPositionDTO);
+//    }
 
-        Player player = UserUtils.GetPlayerByName(userName);
-        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
-
-        Position position = player.getPosition();
-
-        UserPositionDTO userPositionDTO = new UserPositionDTO();
-        userPositionDTO.setX(position.getX());
-        userPositionDTO.setY(position.getY());
-        userPositionDTO.setZ(position.getZ());
-
-        return new JsonResult(userPositionDTO);
-    }
-
-    @ApiRoute(Path = "/api/User/SetPlayerPosition")
-    public JsonResult SetPlayerPosition(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        double x = Double.parseDouble(data.Data.get("x").toString());
-        double y = Double.parseDouble(data.Data.get("y").toString());
-        double z = Double.parseDouble(data.Data.get("z").toString());
-        Object yaw = data.Data.get("yaw");
-        Object pitch = data.Data.get("pitch");
-        Object msg = data.Data.get("message");
-
-        Player player = UserUtils.GetPlayerByName(userName);
-        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
-
-        boolean result = false;
-
-        if (yaw != null && pitch != null) {
-            result = player.setPositionAndRotation(new Vector3(x, y, z), Double.parseDouble(yaw.toString()), Double.parseDouble(pitch.toString()));
-        } else {
-            result = player.setPosition(new Vector3(x, y, z));
-        }
-
-        if (msg != null) {
-            if (result) {
-                player.sendMessage(msg.toString());
-            }
-        }
-
-        return new JsonResult(result);
-    }
+//    @ApiRoute(Path = "/api/User/SetPlayerPosition")
+//    public JsonResult SetPlayerPosition(JsonData data) {
+//        String userName = data.Data.get("name").toString();
+//        double x = Double.parseDouble(data.Data.get("x").toString());
+//        double y = Double.parseDouble(data.Data.get("y").toString());
+//        double z = Double.parseDouble(data.Data.get("z").toString());
+//        Object yaw = data.Data.get("yaw");
+//        Object pitch = data.Data.get("pitch");
+//        Object msg = data.Data.get("message");
+//
+//        Player player = UserUtils.GetPlayerByName(userName);
+//        if (player == null) return new JsonResult(null, 404, "Error: user not found.");
+//
+//        boolean result = false;
+//
+//        if (yaw != null && pitch != null) {
+//            result = player.setPositionAndRotation(new Vector3(x, y, z), Double.parseDouble(yaw.toString()), Double.parseDouble(pitch.toString()));
+//        } else {
+//            result = player.setPosition(new Vector3(x, y, z));
+//        }
+//
+//        if (msg != null) {
+//            if (result) {
+//                player.sendMessage(msg.toString());
+//            }
+//        }
+//
+//        return new JsonResult(result);
+//    }
 
     @ApiRoute(Path = "/api/User/GetPlayerHealth")
     public JsonResult GetPlayerHealth(JsonData data) {
@@ -432,7 +457,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        return new JsonResult(player.getFoodData().getLevel());
+        return new JsonResult(player.getFoodLevel());
     }
 
     @ApiRoute(Path = "/api/User/SetPlayerHunger")
@@ -443,7 +468,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.getFoodData().setLevel(hungerValue);
+        player.setFoodLevel(hungerValue);
 
         return new JsonResult();
     }

@@ -1,9 +1,9 @@
 package tech.v2c.minecraft.plugins.jsonApi;
 
-import cn.nukkit.plugin.PluginBase;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
+
+import org.bukkit.plugin.java.JavaPlugin;
 import org.nanohttpd.util.ServerRunner;
 
 import tech.v2c.minecraft.plugins.jsonApi.EventNotify.Console.ServerConsoleEvent;
@@ -17,7 +17,7 @@ import tech.v2c.minecraft.plugins.jsonApi.tools.LogUtils;
 
 import java.io.IOException;
 
-public class JsonApi extends PluginBase {
+public class JsonApi extends JavaPlugin {
     public static JsonApi instance;
 
     private JsonApiWebSocketServer ws;
@@ -33,28 +33,26 @@ public class JsonApi extends PluginBase {
     @Override
     public void onEnable() {
         InitPlugin();
-
         InitActions();
         RouteManage.RegisterRoute();
         LogUtils.Info("Finish register actions.");
         (new Thread(() -> ServerRunner.run(BaseHttpServer.class))).start();
-        LogUtils.Info("JsonAPI Http Server running at: " + getConfig().getSection("Server").getInt("HttpPort"));
-
+        LogUtils.Info("JsonAPI Http Server running at: " + getConfig().getConfigurationSection("Server").getInt("HttpPort"));
         if (this.isEnableWs) {
-            if(getConfig().getSection("EventListener").getBoolean("OtherEvents")){
+            if(getConfig().getConfigurationSection("EventListener").getBoolean("OtherEvents")){
                 InitEvents();
                 EventManage.RegisterEventListener();
                 LogUtils.Info("Finish register events.");
             }
 
-            if(getConfig().getSection("EventListener").getBoolean("ServerConsole")){
+            if(getConfig().getConfigurationSection("EventListener").getBoolean("ServerConsole")){
                 InitConsoleEvent();
                 LogUtils.Info("Finish register Server Console Event.");
             }
 
             ws = new JsonApiWebSocketServer();
             (new Thread(() -> ws.start())).start();
-            LogUtils.Info("JsonAPI WebSocket Server running at: " + getConfig().getSection("Server").getInt("WsPort"));
+            LogUtils.Info("JsonAPI WebSocket Server running at: " + getConfig().getConfigurationSection("Server").getInt("WsPort"));
         }
     }
 
@@ -94,7 +92,7 @@ public class JsonApi extends PluginBase {
     private void InitPlugin() {
         saveDefaultConfig();
 
-        this.isEnableWs = getConfig().getSection("EventListener").getBoolean("IsEnable");
+        this.isEnableWs = getConfig().getConfigurationSection("EventListener").getBoolean("IsEnable");
         this.isDebugMode = getConfig().getBoolean("DebugMode");
     }
 

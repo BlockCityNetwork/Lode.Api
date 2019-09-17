@@ -1,9 +1,9 @@
 package tech.v2c.minecraft.plugins.jsonApi.EventNotify.Events;
 
-import cn.nukkit.event.EventHandler;
-import cn.nukkit.event.EventPriority;
-import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChatEvent;
 import tech.v2c.minecraft.plugins.jsonApi.EventNotify.global.BaseEventListener;
 import tech.v2c.minecraft.plugins.jsonApi.EventNotify.global.JsonApiWebSocketServer;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;

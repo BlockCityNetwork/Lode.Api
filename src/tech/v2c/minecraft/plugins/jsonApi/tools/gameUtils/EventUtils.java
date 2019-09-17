@@ -1,6 +1,6 @@
 package tech.v2c.minecraft.plugins.jsonApi.tools.gameUtils;
 
-import cn.nukkit.event.Listener;
+import org.bukkit.event.Listener;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 
 public class EventUtils {
