@@ -1,7 +1,10 @@
 package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.util.FileUtil;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
@@ -10,6 +13,7 @@ import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -98,25 +102,30 @@ public class PluginAction extends BaseAction {
     }
 
     // 安装插件
-//    @ApiRoute(Path="/api/Plugin/Install")
-//    public JsonResult InstallPlugin(JsonData data){
-//        Map<String, File> allFile = ( Map<String, File>)data.Data.get("files");
-//        String pluginPath = server.
-//
-//        for (Map.Entry<String, File> plg : allFile.entrySet()) {
-//            final String fileName = plg.getKey();
-//            final File file = plg.getValue();
-//            final String copyPath = pluginPath + fileName;
-//            try {
-//                copyFile(file, new File(copyPath));
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            Plugin uploadPlg = pluginManager.loadPlugin(copyPath);
-//            pluginManager.enablePlugin(uploadPlg);
-//        }
-//
-//        return GetPluginList();
-//    }
+    @ApiRoute(Path="/api/Plugin/Install")
+    public JsonResult InstallPlugin(JsonData data){
+        Map<String, File> allFile = ( Map<String, File>)data.Data.get("files");
+        String pluginPath = "./plugins/";
+
+        for (Map.Entry<String, File> plg : allFile.entrySet()) {
+            final String fileName = plg.getKey();
+            final File file = plg.getValue();
+            final File outFile = new File(pluginPath + fileName);
+
+            try {
+                Files.copy(file.toPath(), outFile.toPath());
+                Plugin uploadPlg = null;
+                uploadPlg = pluginManager.loadPlugin(outFile);
+                pluginManager.enablePlugin(uploadPlg);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InvalidDescriptionException e) {
+                e.printStackTrace();
+            } catch (InvalidPluginException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return GetPluginList();
+    }
 }
