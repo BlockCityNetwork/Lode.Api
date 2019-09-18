@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
@@ -35,7 +34,7 @@ public class UserAction extends BaseAction {
         onlineUser.setHeight(user.getHeight());
         onlineUser.setHealth(user.getHealth());
         onlineUser.setMaxHealth(user.getMaxHealth());
-        // onlineUser.setPing(user.getAddress().getAddress().);
+        onlineUser.setPing(UserUtils.GetPlayerPing(user));
         onlineUser.setOp(user.isOp());
         onlineUser.setExperience(user.getTotalExperience());
         onlineUser.setExperienceLevel(user.getExpToLevel());
@@ -65,7 +64,7 @@ public class UserAction extends BaseAction {
             onlineUser.setHeight(user.getHeight());
             onlineUser.setHealth(user.getHealth());
             onlineUser.setMaxHealth(user.getMaxHealth());
-            // onlineUser.setPing(user.getPing());
+            onlineUser.setPing(UserUtils.GetPlayerPing(user));
             onlineUser.setOp(user.isOp());
             onlineUser.setExperience(user.getTotalExperience());
             onlineUser.setExperienceLevel(user.getExpToLevel());

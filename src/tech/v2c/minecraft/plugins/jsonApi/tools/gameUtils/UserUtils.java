@@ -3,6 +3,7 @@ package tech.v2c.minecraft.plugins.jsonApi.tools.gameUtils;
 import org.bukkit.entity.Player;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 public class UserUtils {
@@ -17,5 +18,21 @@ public class UserUtils {
         }
 
         return player;
+    }
+
+    public static int GetPlayerPing(Player player){
+        try {
+            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+            return entityPlayer.getClass().getField("ping").getInt(entityPlayer);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }
