@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
@@ -305,13 +306,14 @@ public class UserAction extends BaseAction {
     @ApiRoute(Path = "/api/User/KickPlayer")
     public JsonResult KickPlayer(JsonData data) {
         String userName = data.Data.get("name").toString();
-        boolean isKickByAdmin = (boolean) data.Data.get("isKickByAdmin");
         Object reason = data.Data.get("reason");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.kickPlayer("");
+        server.getScheduler().scheduleSyncDelayedTask(JsonApi.instance, () -> {
+            player.kickPlayer(reason == null ? "" : reason.toString());
+        });
 
         return new JsonResult();
     }
