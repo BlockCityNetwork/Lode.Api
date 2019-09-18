@@ -114,14 +114,10 @@ public class PluginAction extends BaseAction {
 
             try {
                 Files.copy(file.toPath(), outFile.toPath());
-                Plugin uploadPlg = null;
-                uploadPlg = pluginManager.loadPlugin(outFile);
+
+                Plugin uploadPlg = pluginManager.loadPlugin(outFile);
                 pluginManager.enablePlugin(uploadPlg);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InvalidDescriptionException e) {
-                e.printStackTrace();
-            } catch (InvalidPluginException e) {
+            } catch (IOException | InvalidDescriptionException | InvalidPluginException e) {
                 e.printStackTrace();
             }
         }
