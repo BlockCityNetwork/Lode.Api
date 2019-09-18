@@ -2,7 +2,6 @@ package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
-import org.bukkit.command.ConsoleCommandSender;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
@@ -26,13 +25,11 @@ public class ServerAction extends BaseAction {
         serverInfo.setIp(server.getIp());
         serverInfo.setMaxPlayerCount(server.getMaxPlayers());
         serverInfo.setMotd(server.getMotd());
-        serverInfo.setSubMotd("");
-        serverInfo.setNukkitVersion(server.getBukkitVersion());
+        serverInfo.setBukkitVersion(server.getBukkitVersion());
         serverInfo.setApiVersion(server.getVersion());
         serverInfo.setGameMode(server.getDefaultGameMode().getValue());
-        // serverInfo.setDifficulty(server.get);
+        serverInfo.setDifficulty(Integer.parseInt(PropsUtils.GetProps("difficulty")));
         serverInfo.setPluginCount(server.getPluginManager().getPlugins().length);
-        // serverInfo.setAutoSave(server.getAutoSave());
         serverInfo.setHasWhiteList(server.hasWhitelist());
 
         return new JsonResult(serverInfo);
@@ -41,7 +38,6 @@ public class ServerAction extends BaseAction {
     @ApiRoute(Path="/api/Server/ExecuteCommand")
     public JsonResult ExecuteCommand(JsonData data){
         String cmd = data.Data.get("command").toString();
-        // TO-DO: 当前不在主线程执行命令时会抛出错误, 但是还是会正常执行. 等待 NukkitX 修复此问题. 具体可见 cn.nukkit.Server.dispatchCommand 的注释. —— By Tuisku 2019-08-17
         boolean executeResult = server.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
         return new JsonResult(executeResult);
@@ -63,7 +59,7 @@ public class ServerAction extends BaseAction {
     @ApiRoute(Path="/api/Server/SetMaxPlayer")
     public JsonResult SetMaxPlayer(JsonData data){
         Integer maxPlayer = (int) Double.parseDouble(data.Data.get("maxPlayer").toString());
-        PropsUtils.Write("max-players", maxPlayer.toString());
+        PropsUtils.SetProps("max-players", maxPlayer.toString());
         // server.reload();
         return new JsonResult(null, 200, "将在下次启动时生效");
     }
@@ -80,7 +76,7 @@ public class ServerAction extends BaseAction {
         String key = data.Data.get("key").toString();
         String value = data.Data.get("value").toString();
 
-        PropsUtils.Write(key, value);
+        PropsUtils.SetProps(key, value);
 
         return new JsonResult(null, 200, "将在下次启动时生效");
     }

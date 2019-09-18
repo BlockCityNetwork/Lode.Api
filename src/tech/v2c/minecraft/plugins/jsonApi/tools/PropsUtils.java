@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Properties;
 
 public class PropsUtils {
-    public static void Write(String pKey, String pValue) {
+    public static void SetProps(String pKey, String pValue) {
         Properties pps = new Properties();
 
         InputStream in = null;
@@ -18,6 +18,21 @@ public class PropsUtils {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static String GetProps(String key) {
+        Properties pps = new Properties();
+        try {
+            InputStream in = new BufferedInputStream(new FileInputStream("./server.properties"));
+            pps.load(in);
+            String value = pps.getProperty(key);
+            System.out.println(key + " = " + value);
+            return value;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

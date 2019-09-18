@@ -7,13 +7,11 @@ public class ServerDTO {
     private String ip;
     private int maxPlayerCount;
     private String motd;
-    private String subMotd;
-    private String nukkitVersion;
+    private String bukkitVersion;
     private String apiVersion;
     private int gameMode;
     private int difficulty;
     private int pluginCount;
-    private boolean isAutoSave;
     private boolean hasWhiteList;
 
     public boolean isHasWhiteList() {
@@ -72,20 +70,12 @@ public class ServerDTO {
         this.motd = motd;
     }
 
-    public String getSubMotd() {
-        return subMotd;
+    public String getBukkitVersion() {
+        return bukkitVersion;
     }
 
-    public void setSubMotd(String subMotd) {
-        this.subMotd = subMotd;
-    }
-
-    public String getNukkitVersion() {
-        return nukkitVersion;
-    }
-
-    public void setNukkitVersion(String nukkitVersion) {
-        this.nukkitVersion = nukkitVersion;
+    public void setBukkitVersion(String bukkitVersion) {
+        this.bukkitVersion = bukkitVersion;
     }
 
     public String getApiVersion() {
@@ -118,13 +108,5 @@ public class ServerDTO {
 
     public void setPluginCount(int pluginCount) {
         this.pluginCount = pluginCount;
-    }
-
-    public boolean isAutoSave() {
-        return isAutoSave;
-    }
-
-    public void setAutoSave(boolean autoSave) {
-        isAutoSave = autoSave;
     }
 }
