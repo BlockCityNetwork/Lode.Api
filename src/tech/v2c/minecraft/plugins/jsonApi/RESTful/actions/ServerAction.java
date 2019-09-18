@@ -1,5 +1,6 @@
 package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
@@ -10,6 +11,7 @@ import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.server.ServerD
 import tech.v2c.minecraft.plugins.jsonApi.tools.PropsUtils;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,14 +58,6 @@ public class ServerAction extends BaseAction {
         return new JsonResult(null, 200, "Server will have reload after 5 seconds.");
     }
 
-    @ApiRoute(Path="/api/Server/SetMaxPlayer")
-    public JsonResult SetMaxPlayer(JsonData data){
-        Integer maxPlayer = (int) Double.parseDouble(data.Data.get("maxPlayer").toString());
-        PropsUtils.SetProps("max-players", maxPlayer.toString());
-        // server.reload();
-        return new JsonResult(null, 200, "将在下次启动时生效");
-    }
-
     @ApiRoute(Path="/api/Server/SendBroadcastMessage")
     public JsonResult SendBroadcastMessage(JsonData data){
         String message = data.Data.get("message").toString();
@@ -78,6 +72,23 @@ public class ServerAction extends BaseAction {
 
         PropsUtils.SetProps(key, value);
 
-        return new JsonResult(null, 200, "将在下次启动时生效");
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                server.reload();
+            }
+        }, 5000);
+
+        return new JsonResult(null, 200, "将在 5s 后重载配置");
+    }
+
+    @ApiRoute(Path="/api/Server/SetWhitelistState")
+    public JsonResult SetWhitelistState(JsonData data){
+        boolean state = Boolean.parseBoolean(data.Data.get("state").toString());
+
+        server.setWhitelist(state);
+
+        return new JsonResult();
     }
 }
