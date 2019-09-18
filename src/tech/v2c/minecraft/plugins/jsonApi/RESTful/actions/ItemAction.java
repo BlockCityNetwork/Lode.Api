@@ -71,8 +71,9 @@ public class ItemAction extends BaseAction {
 
             if (msg != null) {
                 player.sendMessage(msg.toString());
-                return new JsonResult();
             }
+
+            return new JsonResult();
         }
     }
 }
