@@ -31,9 +31,9 @@ public class ItemAction extends BaseAction {
 
     @ApiRoute(Path = "/api/Item/GetItemInfo")
     public JsonResult GetItemInfo(JsonData data) {
-        int itemId = (int) Double.parseDouble(data.Data.get("item").toString());
+        String itemName = data.Data.get("item").toString();
 
-        Material item = Material.getMaterial(itemId);
+        Material item = Material.getMaterial(itemName);
         if(item == null){
             return new JsonResult(null, 404, "Error: item not found.");
         }
@@ -47,7 +47,7 @@ public class ItemAction extends BaseAction {
     @ApiRoute(Path = "/api/Item/SendItemToUser")
     public JsonResult SendItem(JsonData data) {
         String userName = data.Data.get("name").toString();
-        int itemId = (int) Double.parseDouble(data.Data.get("item").toString());
+        String itemName = data.Data.get("item").toString();
         Object count = data.Data.get("count");
         Object msg = data.Data.get("message");
 
@@ -59,7 +59,7 @@ public class ItemAction extends BaseAction {
         } else {
             int firstEmpty = player.getInventory().firstEmpty();
 
-            Material mate = Material.getMaterial(itemId);
+            Material mate = Material.getMaterial(itemName);
             if (mate == null) {
                 return new JsonResult(null, 404, "Error: item not found.");
             }
@@ -72,8 +72,6 @@ public class ItemAction extends BaseAction {
             if (msg != null) {
                 player.sendMessage(msg.toString());
                 return new JsonResult();
-            } else {
-                return new JsonResult(null, 400, "Error: can not send item to player.");
             }
         }
     }
