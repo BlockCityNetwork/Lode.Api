@@ -104,7 +104,7 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/RemoveNameBan")
-    public JsonResult RemoveNameBan(JsonData data){
+    public JsonResult RemoveNameBan(JsonData data) {
         String userName = data.Data.get("target").toString();
         server.getBanList(BanList.Type.NAME).pardon(userName);
 
@@ -112,7 +112,7 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/RemoveIpBan")
-    public JsonResult RemoveIpBan(JsonData data){
+    public JsonResult RemoveIpBan(JsonData data) {
         String ip = data.Data.get("target").toString();
         server.unbanIP(ip);
 
@@ -302,7 +302,6 @@ public class UserAction extends BaseAction {
         return new JsonResult();
     }
 
-    // 无法执行
     @ApiRoute(Path = "/api/User/KickPlayer")
     public JsonResult KickPlayer(JsonData data) {
         String userName = data.Data.get("name").toString();
@@ -346,7 +345,7 @@ public class UserAction extends BaseAction {
         PlayerInventory playerInventory = player.getInventory();
         for (int i = 0; i < playerInventory.getSize(); i++) {
             ItemStack item = playerInventory.getItem(i);
-            if(item != null){
+            if (item != null) {
                 if (item.getType() != Material.getMaterial("AIR")) {
                     PlayerInventoryDTO playerInventoryDTO = new PlayerInventoryDTO();
                     playerInventoryDTO.setIndex(i);
@@ -397,7 +396,6 @@ public class UserAction extends BaseAction {
         return new JsonResult(userPositionDTO);
     }
 
-    // 无法使用
     @ApiRoute(Path = "/api/User/SetPlayerPosition")
     public JsonResult SetPlayerPosition(JsonData data) {
         String userName = data.Data.get("name").toString();
@@ -410,7 +408,8 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.setVelocity(new Location(player.getWorld(),x,y,z).getDirection());
+        player.teleport(new Location(player.getWorld(), x, y, z));
+
         if (msg != null) {
             player.sendMessage(msg.toString());
         }
