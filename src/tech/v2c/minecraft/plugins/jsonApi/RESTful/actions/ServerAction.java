@@ -14,12 +14,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class ServerAction extends BaseAction {
-    @ApiRoute(Path="/api/Server/GetServerInfo")
-    public JsonResult GetServerInfo(){
+    @ApiRoute(Path = "/api/Server/GetServerInfo")
+    public JsonResult GetServerInfo() {
         Server server = JsonApi.instance.getServer();
 
         ServerDTO serverInfo = new ServerDTO();
-        serverInfo.setPort(server.getPort());;
+        serverInfo.setPort(server.getPort());
+        ;
         serverInfo.setVersion(server.getVersion());
         serverInfo.setOnlinePlayerCount(server.getOnlinePlayers().size());
         serverInfo.setIp(server.getIp());
@@ -35,16 +36,18 @@ public class ServerAction extends BaseAction {
         return new JsonResult(serverInfo);
     }
 
-    @ApiRoute(Path="/api/Server/ExecuteCommand")
-    public JsonResult ExecuteCommand(JsonData data){
+    @ApiRoute(Path = "/api/Server/ExecuteCommand")
+    public JsonResult ExecuteCommand(JsonData data) {
         String cmd = data.Data.get("command").toString();
-        boolean executeResult = server.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+        server.getScheduler().scheduleSyncDelayedTask(JsonApi.instance, () -> {
+            server.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+        });
 
-        return new JsonResult(executeResult);
+        return new JsonResult();
     }
 
-    @ApiRoute(Path="/api/Server/ReloadServer")
-    public JsonResult ReloadServer(){
+    @ApiRoute(Path = "/api/Server/ReloadServer")
+    public JsonResult ReloadServer() {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -56,23 +59,23 @@ public class ServerAction extends BaseAction {
         return new JsonResult(null, 200, "Server will have reload after 5 seconds.");
     }
 
-    @ApiRoute(Path="/api/Server/SetMaxPlayer")
-    public JsonResult SetMaxPlayer(JsonData data){
+    @ApiRoute(Path = "/api/Server/SetMaxPlayer")
+    public JsonResult SetMaxPlayer(JsonData data) {
         Integer maxPlayer = (int) Double.parseDouble(data.Data.get("maxPlayer").toString());
         PropsUtils.SetProps("max-players", maxPlayer.toString());
         // server.reload();
         return new JsonResult(null, 200, "将在下次启动时生效");
     }
 
-    @ApiRoute(Path="/api/Server/SendBroadcastMessage")
-    public JsonResult SendBroadcastMessage(JsonData data){
+    @ApiRoute(Path = "/api/Server/SendBroadcastMessage")
+    public JsonResult SendBroadcastMessage(JsonData data) {
         String message = data.Data.get("message").toString();
 
         return new JsonResult(server.broadcastMessage(message));
     }
 
-    @ApiRoute(Path="/api/Server/SetServerProps")
-    public JsonResult SetServerProps(JsonData data){
+    @ApiRoute(Path = "/api/Server/SetServerProps")
+    public JsonResult SetServerProps(JsonData data) {
         String key = data.Data.get("key").toString();
         String value = data.Data.get("value").toString();
 
