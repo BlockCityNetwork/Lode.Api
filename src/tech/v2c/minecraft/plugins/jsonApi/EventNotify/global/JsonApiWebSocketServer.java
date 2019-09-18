@@ -1,6 +1,7 @@
 package tech.v2c.minecraft.plugins.jsonApi.EventNotify.global;
 
 import com.google.gson.Gson;
+import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.java_websocket.WebSocket;
@@ -59,20 +60,22 @@ public class JsonApiWebSocketServer extends WebSocketServer {
             return;
         }
 
-//        if (msg.getAction().equalsIgnoreCase("executeCmd")) {
-//            if (connPool.containsKey(conn.getDraft())) {
-//                if (executeByWs) {
-//                    JsonApi.instance.getServer().dispatchCommand(new ConsoleCommandSender(), msg.getParams().get("command").toString());
-//                    conn.send(gson.toJson(new JsonResult(null, 204, "execute success.")));
-//                }
-//            } else {
-//                conn.send(gson.toJson(new JsonResult(null, 401, "need login!")));
-//            }
-//
-//            return;
-//        }
+        if (msg.getAction().equalsIgnoreCase("executeCmd")) {
+            if (connPool.containsKey(conn.getDraft())) {
+                if (executeByWs) {
+                    JsonApi.instance.getServer().getScheduler().scheduleSyncDelayedTask(JsonApi.instance, () -> {
+                        JsonApi.instance.getServer().dispatchCommand(Bukkit.getConsoleSender(), msg.getParams().get("command").toString());
+                        conn.send(gson.toJson(new JsonResult(null, 204, "execute success.")));
+                    });
+                }
+            } else {
+                conn.send(gson.toJson(new JsonResult(null, 401, "need login!")));
+            }
 
-        conn.send(gson.toJson(new JsonResult(null,403,"unknown command.")));
+            return;
+        }
+
+        conn.send(gson.toJson(new JsonResult(null, 403, "unknown command.")));
     }
 
     @Override

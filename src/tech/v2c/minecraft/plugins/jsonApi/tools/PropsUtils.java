@@ -27,9 +27,7 @@ public class PropsUtils {
             InputStream in = new BufferedInputStream(new FileInputStream("./server.properties"));
             pps.load(in);
             String value = pps.getProperty(key);
-            System.out.println(key + " = " + value);
             return value;
-
         } catch (IOException e) {
             e.printStackTrace();
             return null;

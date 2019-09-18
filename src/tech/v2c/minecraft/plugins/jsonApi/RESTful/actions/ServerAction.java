@@ -11,7 +11,6 @@ import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.server.ServerD
 import tech.v2c.minecraft.plugins.jsonApi.tools.PropsUtils;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,7 +21,6 @@ public class ServerAction extends BaseAction {
 
         ServerDTO serverInfo = new ServerDTO();
         serverInfo.setPort(server.getPort());
-        ;
         serverInfo.setVersion(server.getVersion());
         serverInfo.setOnlinePlayerCount(server.getOnlinePlayers().size());
         serverInfo.setIp(server.getIp());
