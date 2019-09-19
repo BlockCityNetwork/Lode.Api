@@ -97,8 +97,10 @@ public class UserAction extends BaseAction {
     @ApiRoute(Path = "/api/User/BanByIp")
     public JsonResult BanUserByIp(JsonData data) {
         String userIp = data.Data.get("ip").toString();
+        Object reason = data.Data.get("reason");
+        Object endTime = data.Data.get("expirationDate");
 
-        server.banIP(userIp);
+        server.getBanList(BanList.Type.IP).addBan(userIp, reason == null ? "" : reason.toString(), endTime != null ? new Date(Long.parseLong(endTime.toString())) : null, null);
 
         return new JsonResult();
     }
