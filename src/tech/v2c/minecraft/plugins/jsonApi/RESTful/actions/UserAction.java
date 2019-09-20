@@ -69,6 +69,7 @@ public class UserAction extends BaseAction {
             onlineUser.setOp(user.isOp());
             onlineUser.setExperience(user.getTotalExperience());
             onlineUser.setExperienceLevel(user.getExpToLevel());
+            onlineUser.setCurrentWorld(user.getWorld().getName());
 
             UserPositionDTO up = new UserPositionDTO();
             up.setX(user.getLocation().getX());

@@ -16,6 +16,15 @@ public class OnlineUserDTO {
     private boolean isOp;
     private int experience;
     private int experienceLevel;
+    private String currentWorld;
+
+    public String getCurrentWorld() {
+        return currentWorld;
+    }
+
+    public void setCurrentWorld(String currentWorld) {
+        this.currentWorld = currentWorld;
+    }
 
     public boolean isOp() {
         return isOp;
