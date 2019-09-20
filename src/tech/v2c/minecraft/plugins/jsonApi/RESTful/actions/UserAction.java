@@ -39,6 +39,8 @@ public class UserAction extends BaseAction {
         onlineUser.setOp(user.isOp());
         onlineUser.setExperience(user.getTotalExperience());
         onlineUser.setExperienceLevel(user.getExpToLevel());
+        onlineUser.setCurrentWorld(user.getWorld().getName());
+        onlineUser.setLevel(user.getLevel());
 
         UserPositionDTO up = new UserPositionDTO();
         up.setX(user.getLocation().getX());
@@ -70,6 +72,8 @@ public class UserAction extends BaseAction {
         onlineUser.setOp(user.isOp());
         onlineUser.setExperience(user.getTotalExperience());
         onlineUser.setExperienceLevel(user.getExpToLevel());
+        onlineUser.setCurrentWorld(user.getWorld().getName());
+        onlineUser.setLevel(user.getLevel());
 
         UserPositionDTO up = new UserPositionDTO();
         up.setX(user.getLocation().getX());
@@ -101,6 +105,7 @@ public class UserAction extends BaseAction {
             onlineUser.setExperience(user.getTotalExperience());
             onlineUser.setExperienceLevel(user.getExpToLevel());
             onlineUser.setCurrentWorld(user.getWorld().getName());
+            onlineUser.setLevel(user.getLevel());
 
             UserPositionDTO up = new UserPositionDTO();
             up.setX(user.getLocation().getX());

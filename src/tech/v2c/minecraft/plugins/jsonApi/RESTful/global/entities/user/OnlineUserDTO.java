@@ -17,6 +17,15 @@ public class OnlineUserDTO {
     private int experience;
     private int experienceLevel;
     private String currentWorld;
+    private int Level;
+
+    public int getLevel() {
+        return Level;
+    }
+
+    public void setLevel(int level) {
+        Level = level;
+    }
 
     public String getCurrentWorld() {
         return currentWorld;
