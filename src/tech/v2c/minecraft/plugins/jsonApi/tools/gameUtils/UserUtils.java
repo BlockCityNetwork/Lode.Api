@@ -5,6 +5,7 @@ import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.UUID;
 
 public class UserUtils {
     public static Player GetPlayerByName(String name){
@@ -16,6 +17,12 @@ public class UserUtils {
                 break;
             }
         }
+
+        return player;
+    }
+
+    public static Player GetPlayerByUuid(UUID uuid){
+        Player player = JsonApi.instance.getServer().getPlayer(uuid);
 
         return player;
     }
