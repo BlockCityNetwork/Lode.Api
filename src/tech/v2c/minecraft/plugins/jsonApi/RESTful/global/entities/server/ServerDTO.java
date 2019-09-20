@@ -13,6 +13,15 @@ public class ServerDTO {
     private int difficulty;
     private int pluginCount;
     private boolean hasWhiteList;
+    private String serverType;
+
+    public String getServerType() {
+        return serverType;
+    }
+
+    public void setServerType(String serverType) {
+        this.serverType = serverType;
+    }
 
     public boolean isHasWhiteList() {
         return hasWhiteList;

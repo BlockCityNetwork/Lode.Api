@@ -129,7 +129,8 @@ public class UserAction extends BaseAction {
 
             banEntry.setName(banUser.getTarget());
             banEntry.setReason(banUser.getReason());
-            banEntry.setExpires(banUser.getExpiration());
+            banEntry.setExpirationDate(banUser.getExpiration());
+            banEntry.setCreationDate(banUser.getCreated());
 
             banList.add(banEntry);
         });
@@ -146,7 +147,8 @@ public class UserAction extends BaseAction {
 
             banEntry.setName(banUser.getTarget());
             banEntry.setReason(banUser.getReason());
-            banEntry.setExpires(banUser.getExpiration());
+            banEntry.setExpirationDate(banUser.getExpiration());
+            banEntry.setCreationDate(banUser.getCreated());
 
             banList.add(banEntry);
         });

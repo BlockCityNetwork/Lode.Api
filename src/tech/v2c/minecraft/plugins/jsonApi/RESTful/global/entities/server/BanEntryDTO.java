@@ -5,7 +5,8 @@ import java.util.Date;
 public class BanEntryDTO {
     private String name;
     private String reason;
-    private Date expires;
+    private Date creationDate;
+    private Date expirationDate;
 
     public String getName() {
         return name;
@@ -23,11 +24,19 @@ public class BanEntryDTO {
         this.reason = reason;
     }
 
-    public Date getExpires() {
-        return expires;
+    public Date getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setExpires(Date expires) {
-        this.expires = expires;
+    public void setExpirationDate(Date expires) {
+        this.expirationDate = expires;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 }

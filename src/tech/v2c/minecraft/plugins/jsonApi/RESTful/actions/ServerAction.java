@@ -2,6 +2,7 @@ package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Server;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
@@ -32,6 +33,7 @@ public class ServerAction extends BaseAction {
         serverInfo.setDifficulty(Integer.parseInt(PropsUtils.GetProps("difficulty")));
         serverInfo.setPluginCount(server.getPluginManager().getPlugins().length);
         serverInfo.setHasWhiteList(server.hasWhitelist());
+        serverInfo.setServerType(server.getClass().getName());
 
         return new JsonResult(serverInfo);
     }
@@ -84,12 +86,17 @@ public class ServerAction extends BaseAction {
         return new JsonResult(null, 200, "将在 5s 后重载配置");
     }
 
-    @ApiRoute(Path="/api/Server/SetWhitelistState")
-    public JsonResult SetWhitelistState(JsonData data){
+    @ApiRoute(Path = "/api/Server/SetWhitelistState")
+    public JsonResult SetWhitelistState(JsonData data) {
         boolean state = Boolean.parseBoolean(data.Data.get("state").toString());
-
         server.setWhitelist(state);
+        return new JsonResult();
+    }
 
+    @ApiRoute(Path = "/api/Server/SetGameMode")
+    public JsonResult SetGameMode(JsonData data) {
+        int gameMode = (int) Double.parseDouble(data.Data.get("gameMode").toString());
+        server.setDefaultGameMode(gameMode == 0 ? GameMode.SURVIVAL : GameMode.CREATIVE);
         return new JsonResult();
     }
 }
