@@ -1,5 +1,6 @@
 package tech.v2c.minecraft.plugins.jsonApi.RESTful.global;
 
+import cn.nukkit.utils.ConfigSection;
 import com.google.gson.Gson;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nanohttpd.protocols.http.IHTTPSession;
@@ -9,6 +10,7 @@ import org.nanohttpd.protocols.http.response.Status;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.tools.EncryptUtils;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,33 +26,35 @@ public class BaseHttpServer extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         String uri = session.getUri();
-        if (!uri.toLowerCase().contains("/api/server/getstatus") || !JsonApi.instance.isDebugMode) {
-            String clientAuthStr = session.getHeaders().get("x-lode-authentication");
-            // 没有鉴权头
-            if (clientAuthStr == null || clientAuthStr.equals("")) {
-                return Response.newFixedLengthResponse(Status.UNAUTHORIZED, MIME_PLAINTEXT, "Error:  401 Unauthorized. 需要鉴权信息.");
-            }
-
-            //鉴权头不完整
-            if (clientAuthStr.split(";").length != 2) {
-                return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. 鉴权信息不完整.");
-            }
-
-            // 鉴权信息格式:
-            // token: {token}; ts: {timestamp}
-            try {
-                long ts = Long.parseLong(clientAuthStr.split(";")[1].split("=")[1].trim());
-                if (!CheckTimestamp(ts)) {
-                    return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. Timeout.");
+        if (!JsonApi.instance.isDebugMode) {
+            if(!uri.toLowerCase().contains("/api/server/getstatus")){
+                String clientAuthStr = session.getHeaders().get("x-lode-authentication");
+                // 没有鉴权头
+                if (clientAuthStr == null || clientAuthStr.equals("")) {
+                    return Response.newFixedLengthResponse(Status.UNAUTHORIZED, MIME_PLAINTEXT, "Error:  401 Unauthorized. 需要鉴权信息.");
                 }
 
-                String serverAuthStr = GetAuthentication(uri);
-                String token = clientAuthStr.split(";")[0].split("=")[1].trim();
-                if (!serverAuthStr.equalsIgnoreCase(token)) {
-                    return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. Authentication failed.");
+                //鉴权头不完整
+                if (clientAuthStr.split(";").length != 2) {
+                    return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. 鉴权信息不完整.");
                 }
-            } catch (Exception e) {
-                return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. 鉴权信息不正确. " + e.getMessage());
+
+                // 鉴权信息格式:
+                // token: {token}; ts: {timestamp}
+                try {
+                    long ts = Long.parseLong(clientAuthStr.split(";")[1].split("=")[1].trim());
+                    if (!CheckTimestamp(ts)) {
+                        return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. Timeout.");
+                    }
+
+                    String serverAuthStr = GetAuthentication(uri);
+                    String token = clientAuthStr.split(";")[0].split("=")[1].trim();
+                    if (!serverAuthStr.equalsIgnoreCase(token)) {
+                        return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. Authentication failed.");
+                    }
+                } catch (Exception e) {
+                    return Response.newFixedLengthResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "Error: 403 Forbidden. 鉴权信息不正确. " + e.getMessage());
+                }
             }
         }
 
