@@ -2,18 +2,17 @@ package tech.v2c.minecraft.plugins.jsonApi.RESTful.global;
 
 import com.google.gson.Gson;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
-import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class RouteManage {
-    public static HashMap<String, Method> actionRouteMap = new HashMap();
-    public static ArrayList<Class> allAction = new ArrayList<Class> ();
-    private ArrayList<Method> allMethods = new ArrayList<Method>();
+    public static Map<String, Method> actionRouteMap = new HashMap();
+    public static ArrayList<Class> allAction = new ArrayList<>();
 
     // 注册所有路由
     public static void RegisterRoute(){
@@ -29,7 +28,7 @@ public class RouteManage {
     }
 
     // 调用对应的方法
-    public static String TouchAction(String url, JsonData jsonData){
+    public static String TouchAction(String url, Map jsonData){
         Method action = TryGetAction(url);
         if(action == null) return "404";
         JsonResult result = null;
