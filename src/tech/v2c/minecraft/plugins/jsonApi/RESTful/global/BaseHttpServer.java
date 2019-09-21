@@ -24,7 +24,7 @@ public class BaseHttpServer extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         String uri = session.getUri();
-        if (!JsonApi.instance.isDebugMode) {
+        if (!uri.toLowerCase().contains("/api/server/getstatus") || !JsonApi.instance.isDebugMode) {
             String clientAuthStr = session.getHeaders().get("x-lode-authentication");
             // 没有鉴权头
             if (clientAuthStr == null || clientAuthStr.equals("")) {
