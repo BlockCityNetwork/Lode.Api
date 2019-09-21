@@ -5,12 +5,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
-import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.item.ItemDTO;
 import tech.v2c.minecraft.plugins.jsonApi.tools.gameUtils.UserUtils;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ItemAction extends BaseAction {
     @ApiRoute(Path = "/api/Item/GetList")
@@ -30,8 +30,8 @@ public class ItemAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/Item/GetItemInfo")
-    public JsonResult GetItemInfo(JsonData data) {
-        String itemName = data.Data.get("item").toString();
+    public JsonResult GetItemInfo(Map data) {
+        String itemName = data.get("item").toString();
 
         Material item = Material.getMaterial(itemName);
         if(item == null){
@@ -45,11 +45,11 @@ public class ItemAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/Item/SendItemToUser")
-    public JsonResult SendItem(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        String itemName = data.Data.get("item").toString();
-        Object count = data.Data.get("count");
-        Object msg = data.Data.get("message");
+    public JsonResult SendItem(Map data) {
+        String userName = data.get("name").toString();
+        String itemName = data.get("item").toString();
+        Object count = data.get("count");
+        Object msg = data.get("message");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");

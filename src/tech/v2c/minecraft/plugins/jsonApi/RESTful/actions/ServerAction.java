@@ -1,17 +1,17 @@
 package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Server;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
-import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.server.ServerDTO;
+import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.server.ServerStatusDTO;
 import tech.v2c.minecraft.plugins.jsonApi.tools.PropsUtils;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,8 +39,8 @@ public class ServerAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/Server/ExecuteCommand")
-    public JsonResult ExecuteCommand(JsonData data) {
-        String cmd = data.Data.get("command").toString();
+    public JsonResult ExecuteCommand(Map data) {
+        String cmd = data.get("command").toString();
         server.getScheduler().scheduleSyncDelayedTask(JsonApi.instance, () -> {
             server.dispatchCommand(Bukkit.getConsoleSender(), cmd);
         });
@@ -62,16 +62,16 @@ public class ServerAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/Server/SendBroadcastMessage")
-    public JsonResult SendBroadcastMessage(JsonData data) {
-        String message = data.Data.get("message").toString();
+    public JsonResult SendBroadcastMessage(Map data) {
+        String message = data.get("message").toString();
 
         return new JsonResult(server.broadcastMessage(message));
     }
 
     @ApiRoute(Path = "/api/Server/SetServerProps")
-    public JsonResult SetServerProps(JsonData data) {
-        String key = data.Data.get("key").toString();
-        String value = data.Data.get("value").toString();
+    public JsonResult SetServerProps(Map data) {
+        String key = data.get("key").toString();
+        String value = data.get("value").toString();
 
         PropsUtils.SetProps(key, value);
 
@@ -87,16 +87,25 @@ public class ServerAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/Server/SetWhitelistState")
-    public JsonResult SetWhitelistState(JsonData data) {
-        boolean state = Boolean.parseBoolean(data.Data.get("state").toString());
+    public JsonResult SetWhitelistState(Map data) {
+        boolean state = Boolean.parseBoolean(data.get("state").toString());
         server.setWhitelist(state);
         return new JsonResult();
     }
 
     @ApiRoute(Path = "/api/Server/SetGameMode")
-    public JsonResult SetGameMode(JsonData data) {
-        int gameMode = (int) Double.parseDouble(data.Data.get("gameMode").toString());
+    public JsonResult SetGameMode(Map data) {
+        int gameMode = (int) Double.parseDouble(data.get("gameMode").toString());
         server.setDefaultGameMode(gameMode == 0 ? GameMode.SURVIVAL : GameMode.CREATIVE);
         return new JsonResult();
+    }
+
+    @ApiRoute(Path = "/api/Server/GetStatus")
+    public JsonResult GetStatus(){
+        ServerStatusDTO state = new ServerStatusDTO();
+        state.setMaxPlayer(server.getMaxPlayers());
+        state.setOnlinePlayer(server.getOnlinePlayers().size());
+
+        return new JsonResult(state);
     }
 }

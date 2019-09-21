@@ -4,10 +4,8 @@ import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.util.FileUtil;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
-import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.server.PluginDTO;
 import tech.v2c.minecraft.plugins.jsonApi.tools.results.JsonResult;
 
@@ -15,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -49,8 +46,8 @@ public class PluginAction extends BaseAction {
     }
 
     @ApiRoute(Path="/api/Plugin/GetPluginInfo")
-    public JsonResult GetPluginInfo(JsonData data){
-        Plugin plugin = pluginManager.getPlugin(data.Data.get("name").toString());
+    public JsonResult GetPluginInfo(Map data){
+        Plugin plugin = pluginManager.getPlugin(data.get("name").toString());
 
         if(plugin == null) return new JsonResult(null, 404, "Error: plugin not found.");
 
@@ -68,8 +65,8 @@ public class PluginAction extends BaseAction {
 
     // 关闭指定插件
     @ApiRoute(Path="/api/Plugin/Disable")
-    public JsonResult DisablePluginByName(JsonData data){
-        Plugin plugin = pluginManager.getPlugin(data.Data.get("name").toString());
+    public JsonResult DisablePluginByName(Map data){
+        Plugin plugin = pluginManager.getPlugin(data.get("name").toString());
 
         if(plugin == null) return new JsonResult(null, 404, "Error: plugin not found.");
 
@@ -83,8 +80,8 @@ public class PluginAction extends BaseAction {
 
     // 开启指定插件
     @ApiRoute(Path="/api/Plugin/Enable")
-    public JsonResult EnablePluginByName(JsonData data){
-        Plugin plugin = pluginManager.getPlugin(data.Data.get("name").toString());
+    public JsonResult EnablePluginByName(Map data){
+        Plugin plugin = pluginManager.getPlugin(data.get("name").toString());
 
         if(plugin == null) return new JsonResult(null, 404, "Error: plugin not found.");
 
@@ -103,8 +100,8 @@ public class PluginAction extends BaseAction {
 
     // 安装插件
     @ApiRoute(Path="/api/Plugin/Install")
-    public JsonResult InstallPlugin(JsonData data){
-        Map<String, File> allFile = ( Map<String, File>)data.Data.get("files");
+    public JsonResult InstallPlugin(Map data){
+        Map<String, File> allFile = ( Map<String, File>)data.get("files");
         String pluginPath = "./plugins/";
 
         for (Map.Entry<String, File> plg : allFile.entrySet()) {

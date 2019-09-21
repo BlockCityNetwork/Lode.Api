@@ -2,13 +2,11 @@ package tech.v2c.minecraft.plugins.jsonApi.RESTful.actions;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import tech.v2c.minecraft.plugins.jsonApi.JsonApi;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.BaseAction;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.annotations.ApiRoute;
-import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.JsonData;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.server.BanEntryDTO;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.user.OnlineUserDTO;
 import tech.v2c.minecraft.plugins.jsonApi.RESTful.global.entities.user.PlayerInventoryDTO;
@@ -20,8 +18,8 @@ import java.util.*;
 
 public class UserAction extends BaseAction {
     @ApiRoute(Path = "/api/User/GetUserByName")
-    public JsonResult GetUserByName(JsonData data) {
-        String searchName = data.Data.get("name").toString();
+    public JsonResult GetUserByName(Map data) {
+        String searchName = data.get("name").toString();
 
         Player user = UserUtils.GetPlayerByName(searchName);
         if (user == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -53,8 +51,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/GetUserByUuid")
-    public JsonResult GetUserByUuid(JsonData data) {
-        UUID uuid = UUID.fromString(data.Data.get("uuid").toString());
+    public JsonResult GetUserByUuid(Map data) {
+        UUID uuid = UUID.fromString(data.get("uuid").toString());
 
         Player user = UserUtils.GetPlayerByUuid(uuid);
         if (user == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -121,10 +119,10 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/BanByName")
-    public JsonResult BanUserByName(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        Object reason = data.Data.get("reason");
-        Object endTime = data.Data.get("expirationDate");
+    public JsonResult BanUserByName(Map data) {
+        String userName = data.get("name").toString();
+        Object reason = data.get("reason");
+        Object endTime = data.get("expirationDate");
 
         server.getBanList(BanList.Type.NAME).addBan(userName, reason == null ? "" : reason.toString(), endTime != null ? new Date(Long.parseLong(endTime.toString())) : null, null);
 
@@ -132,10 +130,10 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/BanByIp")
-    public JsonResult BanUserByIp(JsonData data) {
-        String userIp = data.Data.get("ip").toString();
-        Object reason = data.Data.get("reason");
-        Object endTime = data.Data.get("expirationDate");
+    public JsonResult BanUserByIp(Map data) {
+        String userIp = data.get("ip").toString();
+        Object reason = data.get("reason");
+        Object endTime = data.get("expirationDate");
 
         server.getBanList(BanList.Type.IP).addBan(userIp, reason == null ? "" : reason.toString(), endTime != null ? new Date(Long.parseLong(endTime.toString())) : null, null);
 
@@ -143,16 +141,16 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/RemoveNameBan")
-    public JsonResult RemoveNameBan(JsonData data) {
-        String userName = data.Data.get("target").toString();
+    public JsonResult RemoveNameBan(Map data) {
+        String userName = data.get("target").toString();
         server.getBanList(BanList.Type.NAME).pardon(userName);
 
         return new JsonResult();
     }
 
     @ApiRoute(Path = "/api/User/RemoveIpBan")
-    public JsonResult RemoveIpBan(JsonData data) {
-        String ip = data.Data.get("target").toString();
+    public JsonResult RemoveIpBan(Map data) {
+        String ip = data.get("target").toString();
         server.unbanIP(ip);
 
         return new JsonResult();
@@ -204,16 +202,16 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/AddWhiteList")
-    public JsonResult AddWhiteList(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult AddWhiteList(Map data) {
+        String userName = data.get("name").toString();
         OfflinePlayer player = server.getOfflinePlayer(userName);
         player.setWhitelisted(true);
         return GetWhiteList();
     }
 
     @ApiRoute(Path = "/api/User/RemoveWhiteList")
-    public JsonResult RemoveWhiteList(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult RemoveWhiteList(Map data) {
+        String userName = data.get("name").toString();
         OfflinePlayer player = server.getOfflinePlayer(userName);
         player.setWhitelisted(false);
         return GetWhiteList();
@@ -229,8 +227,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/AddOp")
-    public JsonResult AddOp(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult AddOp(Map data) {
+        String userName = data.get("name").toString();
         OfflinePlayer player = server.getOfflinePlayer(userName);
         player.setOp(true);
 
@@ -238,8 +236,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/RemoveOp")
-    public JsonResult RemoveOp(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult RemoveOp(Map data) {
+        String userName = data.get("name").toString();
         OfflinePlayer player = server.getOfflinePlayer(userName);
         player.setOp(false);
 
@@ -247,9 +245,9 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SetGameMode")
-    public JsonResult SetGameMode(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        int gameMode = (int) Double.parseDouble(data.Data.get("gameMode").toString());
+    public JsonResult SetGameMode(Map data) {
+        String userName = data.get("name").toString();
+        int gameMode = (int) Double.parseDouble(data.get("gameMode").toString());
         Player user = UserUtils.GetPlayerByName(userName);
         if (user == null) return new JsonResult(null, 404, "Error: user not found.");
 
@@ -259,10 +257,10 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SendChat")
-    public JsonResult SendChat(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        String message = data.Data.get("message").toString();
-        Object source = data.Data.get("source");
+    public JsonResult SendChat(Map data) {
+        String userName = data.get("name").toString();
+        String message = data.get("message").toString();
+        Object source = data.get("source");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -273,9 +271,9 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SendMessage")
-    public JsonResult SendMessage(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        String message = data.Data.get("message").toString();
+    public JsonResult SendMessage(Map data) {
+        String userName = data.get("name").toString();
+        String message = data.get("message").toString();
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -286,11 +284,11 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SendExperience")
-    public JsonResult SendExperience(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        int expType = (int) Double.parseDouble(data.Data.get("type").toString());
-        int value = (int) Double.parseDouble(data.Data.get("value").toString());
-        Object msg = data.Data.get("message");
+    public JsonResult SendExperience(Map data) {
+        String userName = data.get("name").toString();
+        int expType = (int) Double.parseDouble(data.get("type").toString());
+        int value = (int) Double.parseDouble(data.get("value").toString());
+        Object msg = data.get("message");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -309,10 +307,10 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SetPlayerFire")
-    public JsonResult SetPlayerFire(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        int time = (int) Double.parseDouble(data.Data.get("time").toString());
-        Object msg = data.Data.get("message");
+    public JsonResult SetPlayerFire(Map data) {
+        String userName = data.get("name").toString();
+        int time = (int) Double.parseDouble(data.get("time").toString());
+        Object msg = data.get("message");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -327,9 +325,9 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/KillPlayer")
-    public JsonResult KillPlayer(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        Object msg = data.Data.get("message");
+    public JsonResult KillPlayer(Map data) {
+        String userName = data.get("name").toString();
+        Object msg = data.get("message");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -344,9 +342,9 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/KickPlayer")
-    public JsonResult KickPlayer(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        Object reason = data.Data.get("reason");
+    public JsonResult KickPlayer(Map data) {
+        String userName = data.get("name").toString();
+        Object reason = data.get("reason");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -359,9 +357,9 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/ClearPlayerInventory")
-    public JsonResult ClearPlayerInventory(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        Object msg = data.Data.get("message");
+    public JsonResult ClearPlayerInventory(Map data) {
+        String userName = data.get("name").toString();
+        Object msg = data.get("message");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -376,8 +374,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/GetPlayerInventory")
-    public JsonResult GetPlayerInventory(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult GetPlayerInventory(Map data) {
+        String userName = data.get("name").toString();
         ArrayList<PlayerInventoryDTO> list = new ArrayList<PlayerInventoryDTO>();
 
         Player player = UserUtils.GetPlayerByName(userName);
@@ -403,8 +401,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/GetInHandItem")
-    public JsonResult GetInHandItem(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult GetInHandItem(Map data) {
+        String userName = data.get("name").toString();
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -422,8 +420,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/GetPlayerPosition")
-    public JsonResult GetPlayerPosition(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult GetPlayerPosition(Map data) {
+        String userName = data.get("name").toString();
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -438,13 +436,13 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SetPlayerPosition")
-    public JsonResult SetPlayerPosition(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        double x = Double.parseDouble(data.Data.get("x").toString());
-        double y = Double.parseDouble(data.Data.get("y").toString());
-        double z = Double.parseDouble(data.Data.get("z").toString());
+    public JsonResult SetPlayerPosition(Map data) {
+        String userName = data.get("name").toString();
+        double x = Double.parseDouble(data.get("x").toString());
+        double y = Double.parseDouble(data.get("y").toString());
+        double z = Double.parseDouble(data.get("z").toString());
 
-        Object msg = data.Data.get("message");
+        Object msg = data.get("message");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -459,8 +457,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/GetPlayerHealth")
-    public JsonResult GetPlayerHealth(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult GetPlayerHealth(Map data) {
+        String userName = data.get("name").toString();
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -469,9 +467,9 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SetPlayerHealth")
-    public JsonResult SetPlayerHealth(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        float healthValue = Float.parseFloat(data.Data.get("value").toString());
+    public JsonResult SetPlayerHealth(Map data) {
+        String userName = data.get("name").toString();
+        float healthValue = Float.parseFloat(data.get("value").toString());
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -482,8 +480,8 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/GetPlayerHunger")
-    public JsonResult GetPlayerHunger(JsonData data) {
-        String userName = data.Data.get("name").toString();
+    public JsonResult GetPlayerHunger(Map data) {
+        String userName = data.get("name").toString();
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -492,9 +490,9 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SetPlayerHunger")
-    public JsonResult SetPlayerHunger(JsonData data) {
-        String userName = data.Data.get("name").toString();
-        int hungerValue = (int) Double.parseDouble(data.Data.get("value").toString());
+    public JsonResult SetPlayerHunger(Map data) {
+        String userName = data.get("name").toString();
+        int hungerValue = (int) Double.parseDouble(data.get("value").toString());
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
@@ -505,10 +503,10 @@ public class UserAction extends BaseAction {
     }
 
     @ApiRoute(Path = "/api/User/SetAllowFlight")
-    public JsonResult SetAllowFlight(JsonData data){
-        String userName = data.Data.get("name").toString();
-        boolean canFly = Boolean.parseBoolean(data.Data.get("state").toString());
-        Object msg = data.Data.get("message");
+    public JsonResult SetAllowFlight(Map data){
+        String userName = data.get("name").toString();
+        boolean canFly = Boolean.parseBoolean(data.get("state").toString());
+        Object msg = data.get("message");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
