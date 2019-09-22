@@ -477,7 +477,14 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.setHealth(healthValue);
+        server.getScheduler().scheduleSyncDelayedTask(Lode.instance, () -> {
+            player.setHealth(healthValue);
+        });
+
+        Object msg = data.get("message");
+        if (msg != null) {
+            player.sendMessage(msg.toString());
+        }
 
         return new JsonResult();
     }
@@ -500,7 +507,14 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.setFoodLevel(hungerValue);
+        server.getScheduler().scheduleSyncDelayedTask(Lode.instance, () -> {
+            player.setFoodLevel(hungerValue);
+        });
+
+        Object msg = data.get("message");
+        if (msg != null) {
+            player.sendMessage(msg.toString());
+        }
 
         return new JsonResult();
     }
