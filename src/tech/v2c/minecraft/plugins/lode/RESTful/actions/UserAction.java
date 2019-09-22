@@ -251,7 +251,9 @@ public class UserAction extends BaseAction {
         Player user = UserUtils.GetPlayerByName(userName);
         if (user == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        user.setGameMode(GameMode.getByValue(gameMode));
+        server.getScheduler().scheduleSyncDelayedTask(Lode.instance, () -> {
+            user.setGameMode(GameMode.getByValue(gameMode));
+        });
 
         return new JsonResult();
     }
@@ -260,7 +262,6 @@ public class UserAction extends BaseAction {
     public JsonResult SendChat(Map data) {
         String userName = data.get("name").toString();
         String message = data.get("message").toString();
-        Object source = data.get("source");
 
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
