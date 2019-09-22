@@ -28,6 +28,11 @@ public class LodeWebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        if (Lode.instance.isDebugMode) {
+            Gson gson = new Gson();
+            conn.send(gson.toJson(new JsonResult(null, 204, "Debug mode.")));
+            connPool.put(conn.getDraft(), conn);
+        }
     }
 
     @Override
@@ -60,7 +65,7 @@ public class LodeWebSocketServer extends WebSocketServer {
         }
 
         if (msg.getAction().equalsIgnoreCase("executeCmd")) {
-            if (connPool.containsKey(conn.getDraft())) {
+            if (Lode.instance.isDebugMode || connPool.containsKey(conn.getDraft())) {
                 if (executeByWs) {
                     Lode.instance.getServer().getScheduler().scheduleSyncDelayedTask(Lode.instance, () -> {
                         Lode.instance.getServer().dispatchCommand(Bukkit.getConsoleSender(), msg.getParams().get("command").toString());
