@@ -316,7 +316,7 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.setFireTicks(time);
+        player.setFireTicks(time / 1000 * 20);
 
         if (msg != null) {
             player.sendMessage(msg.toString());
