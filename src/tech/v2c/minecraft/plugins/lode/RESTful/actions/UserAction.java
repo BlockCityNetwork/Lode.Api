@@ -333,7 +333,9 @@ public class UserAction extends BaseAction {
         Player player = UserUtils.GetPlayerByName(userName);
         if (player == null) return new JsonResult(null, 404, "Error: user not found.");
 
-        player.setHealth(0);
+        server.getScheduler().scheduleSyncDelayedTask(Lode.instance, () -> {
+            player.setHealth(0);
+        });
 
         if (msg != null) {
             player.sendMessage(msg.toString());
