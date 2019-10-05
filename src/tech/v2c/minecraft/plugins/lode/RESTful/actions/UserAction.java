@@ -119,7 +119,7 @@ public class UserAction extends BaseAction {
     @ApiRoute(Path = "/api/User/GetOnlineList2")
     public JsonResult GetOnlineUserList2() {
         Map<UUID, Player> users = server.getOnlinePlayers();
-        ArrayList<OnlineSimpleUserDTO> userList = new ArrayList<OnlineSimpleUserDTO>();
+        ArrayList<OnlineSimpleUserDTO> userList = new ArrayList<>();
 
         for (Map.Entry<UUID, Player> user : users.entrySet()) {
             OnlineSimpleUserDTO onlineUser = new OnlineSimpleUserDTO();
